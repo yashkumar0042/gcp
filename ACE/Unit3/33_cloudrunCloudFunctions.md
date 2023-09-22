@@ -291,7 +291,7 @@ Serverless computing is a cloud computing model where you don't need to provisio
 ### Managing Function Logs
 
 - Cloud Functions automatically log function execution details.
-- Use Stackdriver Logging to view and analyze function logs.
+- Use Operational Monitoring and Logging to view and analyze function logs.
 - Set up log filters and custom log exports for monitoring and troubleshooting.
 
 ---
