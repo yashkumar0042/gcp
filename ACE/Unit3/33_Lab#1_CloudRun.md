@@ -100,7 +100,7 @@ In this part, you will build a custom Docker image containing a Python applicati
 
 1. Open Cloud Shell.
 
-2. Create a Dockerfile for your Python application in your source code repository. Here's an example Dockerfile:
+2. Create a Dockerfile and app.py for your Python application in your source code repository. Here's an example Dockerfile:
 
    ```Dockerfile
    # Use the official Python image as the base image
@@ -123,6 +123,20 @@ In this part, you will build a custom Docker image containing a Python applicati
 
    # Run app.py when the container launches
    CMD ["python", "app.py"]
+   ```
+
+   ```python
+   from flask import Flask
+   
+   app = Flask(__name__)
+   
+   @app.route('/')
+   def hello_world():
+       return 'Hello, World! This is a Flask app running on Google Cloud Run.'
+   
+   if __name__ == '__main__':
+       app.run(host='0.0.0.0', port=8080)
+
    ```
 
 3. Build and push the Docker image to Google Container Registry (GCR) using Cloud Build:
