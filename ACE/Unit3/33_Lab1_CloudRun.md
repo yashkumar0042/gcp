@@ -128,20 +128,28 @@ In this part, you will build a custom Docker image containing a Python applicati
 3. Build and push the Docker image to Google Container Registry (GCR) using Cloud Build:
 
    ```bash
-   gcloud builds submit --tag gcr.io/<PROJECT_ID>/<IMAGE_NAME>
+   docker build -t gcr.io/<PROJECT_ID>/<IMAGE_NAME>
+
+   docker build -t gcr.io/compute-section/newimage .
    ```
 
    Replace `<PROJECT_ID>` with your GCP project ID and `<IMAGE_NAME>` with a name for your custom image.
 
-4. Go to "Cloud Run" in the Cloud Console.
+4. Push the image to container registry
+   ```bash
+     docker push gcr.io/compute-section/newimage
+   ```
+5. Go to "Cloud Run" in the Cloud Console.
 
-5. Run the following command to deploy your custom image:
+6. Run the following command to deploy your custom image:
 
    ```bash
    gcloud run deploy <SERVICE_NAME> \
      --image gcr.io/<PROJECT_ID>/<IMAGE_NAME> \
      --platform managed \
      --region <REGION>
+
+   gcloud run deploy newservice --image gcr.io/compute-section/newimage --platform managed --region us-central1
    ```
 
    Replace `<SERVICE_NAME>` with a name for your service, `<PROJECT_ID>` with your GCP project ID, `<IMAGE_NAME>` with your custom image name, and `<REGION>` with your desired region.
