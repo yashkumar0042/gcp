@@ -193,20 +193,42 @@ In this part, you will learn how to perform traffic splitting between different 
      --image gcr.io/<PROJECT_ID>/<NEW_IMAGE_NAME> \
      --platform managed \
      --region <REGION>
+
+   # Deploy "v1"
+   gcloud run deploy v1 --image=gcr.io/PROJECT_ID/my-service:v1 --platform=managed --region=REGION
+
+# Deploy "v2"
+   gcloud run deploy v2 --image=gcr.io/PROJECT_ID/my-service:v2 --platform=managed --region=REGION
+
    ```
 
    Replace `<SERVICE_NAME>` with your service name, `<PROJECT_ID>` with your GCP project ID, `<NEW_IMAGE_NAME>` with the new image name, and `<REGION>` with your desired region.
 
-3. After the new revision is deployed, use the following command to adjust traffic allocation:
+3. To see the services running, run below command:-
+```bash
+   gcloud run services list
+   gcloud run services describe newservice --region=us-central1
+```
+4. After the new revision is deployed, use the following command to adjust traffic allocation:
 
    ```bash
    gcloud run services update-traffic <SERVICE_NAME> \
      --to-latest
    ```
+or 
+```bash
+   gcloud run services update-traffic my-service --to-revisions=v1=80,v2=20 --platform=managed --region=REGION
+
+```
 
    Replace `<SERVICE_NAME>` with your service name.
 
-4. Access your service URL to observe the traffic distribution between revisions.
+5. You can check the traffice splitting by running below command:-
+   ```bash
+   gcloud run services describe my-service --platform=managed --region=REGION
+
+   ```
+6. Access your service URL to observe the traffic distribution between revisions.
 
 ## Conclusion
 
