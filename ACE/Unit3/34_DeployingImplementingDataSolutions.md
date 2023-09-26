@@ -8,7 +8,7 @@ Google Cloud SQL is a fully managed relational database service that supports po
   - Cloud SQL is a fully managed database service provided by Google Cloud.
   - It offers high availability, automated backups, and seamless scaling.
  
-    <img src ="https://github.com/yashkumar0042/gcp/assets/53463349/34a048ce-fce1-440c-961f-85a4e3cc2aa0" width="200" height="400">
+    <img src ="https://github.com/yashkumar0042/gcp/assets/53463349/34a048ce-fce1-440c-961f-85a4e3cc2aa0" width="400" height="400">
 
 
 - **Creating a Cloud SQL Instance (GUI):**
