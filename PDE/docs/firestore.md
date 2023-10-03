@@ -12,8 +12,9 @@ Here's how you can create a GAE application that inserts data into Firestore:
 
    ```yaml
   runtime: python39
-  entrypoint: gunicorn -b :8080 main:app
-  env_variables:
+entrypoint: gunicorn -b :8080 main:app
+
+env_variables:
   GOOGLE_CLOUD_PROJECT: eminent-bond-400602
   ```
 
