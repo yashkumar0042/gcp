@@ -12,11 +12,11 @@ Here's how you can create a GAE application that inserts data into Firestore:
 
    ```yaml
    runtime: python39
-   entrypoint: gunicorn -b :$PORT main:app
+entrypoint: gunicorn -b :8080 main:app
 
-   env_variables:
-     GOOGLE_CLOUD_PROJECT: your-project-id
-   ```
+env_variables:
+  GOOGLE_CLOUD_PROJECT: compute-section
+  ```
 
    Replace `your-project-id` with your actual Google Cloud project ID.
 
@@ -25,9 +25,9 @@ Here's how you can create a GAE application that inserts data into Firestore:
    In your project directory, create a `requirements.txt` file and add the following dependencies:
 
    ```
-   Flask==2.1.1
-   google-cloud-firestore==2.3.1
-   gunicorn==20.1.1
+   Flask
+   google-cloud-firestore
+   gunicorn
    ```
 
    Install these dependencies using `pip`:
@@ -54,7 +54,7 @@ Here's how you can create a GAE application that inserts data into Firestore:
    @app.route('/add_data', methods=['POST'])
    def add_data():
        data = request.form['data']
-       doc_ref = db.collection('your-collection-name').add({'data': data})
+       doc_ref = db.collection('shares').add({'data': data})
        return redirect(url_for('index'))
 
    if __name__ == '__main__':
