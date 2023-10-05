@@ -188,8 +188,64 @@ When working with Google Cloud Data Fusion, consider the following best practice
 - **Error Handling**: Implement robust error handling to ensure pipelines can recover gracefully from failures.
 - **Security and Compliance**: Follow security best practices and ensure compliance with industry regulations.
 
-## 11. Conclusion
+## LAB - Composer Dags Excution to Calll DataFusion
+```python
+from airflow import DAG
+from airflow.providers.google.cloud.operators.datafusion import DataFusionCreateInstanceOperator, DataFusionStartInstanceOperator
+from airflow.operators.python_operator import PythonOperator
+from datetime import datetime
+from google.auth import exceptions
 
-Google Cloud Data Fusion offers a powerful and user-friendly platform for data integration and ETL tasks. Its visual interface, pre-built connectors, and support for real-time and batch processing make it a valuable tool for organizations looking to harness the full potential of their data.
+# Define default arguments for the DAG
+default_args = {
+    'owner': 'your_name',
+    'depends_on_past': False,
+    'start_date': datetime(2023, 1, 1),
+    'retries': 1,
+}
 
-By understanding the technical details, features, and best practices associated with Google Cloud Data Fusion, you can confidently build and manage data pipelines that drive insights and innovation in your organization. Whether you are migrating data, performing real-time analytics, or preparing data for machine learning, Data Fusion is a versatile solution that can meet your data integration needs.
+# Create a DAG instance
+dag = DAG(
+    'data_fusion_etl_dag',
+    default_args=default_args,
+    description='A DAG to run a Data Fusion ETL pipeline',
+    schedule_interval=None,  # Set the schedule interval or trigger manually
+    catchup=False,  # Set to False to avoid backfilling
+)
+
+# Define a Python function to execute the Data Fusion ETL pipeline
+def execute_data_fusion_pipeline():
+    from google.cloud import data_fusion_v1beta1
+    from google.auth import exceptions
+
+    try:
+        client = data_fusion_v1beta1.EnvironmentsClient()
+        instance_name='new-datafusion-instance',
+        location='us-west1',
+        pipeline_name='data-pipeline',
+        project_id='compute-section',
+        parent = f'projects/{location}/locations/{location}/instances/{instance_name}'
+        instance = client.get(name=parent)
+
+        request = data_fusion_v1beta1.StartPipelineRequest(
+            name=f'projects/{location}/locations/{location}/instances/{instance_name}/pipelines/{pipeline_name}'
+        )
+
+        client.start(request=request)
+    
+    except exceptions.DefaultCredentialsError as e:
+        print("Authentication Error: Please ensure your service account credentials are properly configured.")
+        raise e
+    except Exception as e:
+        print(f"Error: {e}")
+        raise e
+
+# Define the PythonOperator to execute the Data Fusion pipeline
+execute_data_fusion_task = PythonOperator(
+    task_id='execute_data_fusion_pipeline',
+    python_callable=execute_data_fusion_pipeline,
+    provide_context=False,
+    dag=dag,
+)
+
+```
