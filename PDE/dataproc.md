@@ -167,7 +167,14 @@ For specific pricing details, it's advisable to visit the [Google Cloud Pricing 
      --worker-machine-type=MACHINE_TYPE \
      --num-workers=NUM_WORKERS
    ```
-
+```bash
+gcloud dataproc clusters create my-dataproc-cluster \
+  --region=us-central1 \
+  --zone=us-central1-b \
+  --master-machine-type=n1-standard-4 \
+  --worker-machine-type=n1-standard-4 \
+  --num-workers=2
+```
    - Customize the command with additional flags and parameters as needed.
 
 3. **Access Cluster**:
