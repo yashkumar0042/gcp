@@ -210,8 +210,11 @@ Here's an example of launching a Python application to calculate the value of Pi
 2. **Upload the Script**:
 
    Upload the Python script to a location accessible by Dataproc, such as Google Cloud Storage or HDFS.
+   ```bash
+   gsutil cp calculate_pi.py  gs://fusion-bucket-5878/
+   ```
 
-3. **Submit a Dataproc Job**:
+4. **Submit a Dataproc Job**:
 
    Use the `gcloud` command to submit a Dataproc job to run the Python script on the cluster.
 
@@ -222,10 +225,14 @@ Here's an example of launching a Python application to calculate the value of Pi
      --py-files=SCRIPT_LOCATION/calculate_pi.py \
      SCRIPT_LOCATION/calculate_pi.py
    ```
-
    Replace `CLUSTER_NAME`, `REGION`, and `SCRIPT_LOCATION` with your specific values.
 
-4. **Monitor Job Progress**:
+   example: -
+   ```bash
+   gcloud dataproc jobs submit pyspark   --cluster=my-dataproc-cluster   --region=us-central1   --py-files=gs://fusion-bucket-5878/calculate_pi.py   gs://fusion-bucket-5878/calculate_pi.py
+   ```
+
+6. **Monitor Job Progress**:
 
    You can monitor the job's progress and view the output using the Dataproc web interfaces or `gcloud` CLI.
 
