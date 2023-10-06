@@ -189,26 +189,27 @@ Here's an example of launching a Python application to calculate the value of Pi
 
    Create a Python script that calculates Pi using a suitable algorithm. Save this script, e.g., `calculate_pi.py`.
 
-   ```pythonimport random
-import decimal
+   ```python
+   import random
+   import decimal
+   
+   # Set the precision to 100 decimal places
+   decimal.getcontext().prec = 102
+   
+   def calculate_pi(num_samples):
+       inside_circle = 0
+       for _ in range(num_samples):
+           x = decimal.Decimal(random.random())
+           y = decimal.Decimal(random.random())
+           if x**2 + y**2 <= 1:
+               inside_circle += 1
+       pi_approximation = (inside_circle / num_samples) * 4
+       return f"{pi_approximation:.100f}"  # Format the result with 100 decimal places
 
-# Set the precision to 100 decimal places
-decimal.getcontext().prec = 102
-
-def calculate_pi(num_samples):
-    inside_circle = 0
-    for _ in range(num_samples):
-        x = decimal.Decimal(random.random())
-        y = decimal.Decimal(random.random())
-        if x**2 + y**2 <= 1:
-            inside_circle += 1
-    pi_approximation = (inside_circle / num_samples) * 4
-    return f"{pi_approximation:.100f}"  # Format the result with 100 decimal places
-
-if __name__ == "__main__":
-    num_samples = 10000000  # Increase the number of samples for higher precision
-    result = calculate_pi(num_samples)
-    print(f"Estimated value of Pi (100 decimal places):\n{result}")
+   if __name__ == "__main__":
+       num_samples = 10000000  # Increase the number of samples for higher precision
+       result = calculate_pi(num_samples)
+       print(f"Estimated value of Pi (100 decimal places):\n{result}")
 
    ```
 
