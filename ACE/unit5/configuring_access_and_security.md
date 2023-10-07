@@ -173,3 +173,67 @@ Service account impersonation allows one service account to act on behalf of ano
 Google Cloud provides mechanisms for creating short-lived credentials for service accounts, enhancing security. These credentials can be created using Google Cloud Identity Platform, Identity Token, or other methods. They allow temporary access to resources and are especially useful for short-lived tasks.
 
 Managing service accounts effectively is essential for secure, automated, and well-controlled interactions between applications and Google Cloud services. Properly configuring permissions and roles for service accounts ensures that they have the necessary access without exposing your environment to unnecessary risks.
+
+# Viewing Audit Logs in Google Cloud
+
+Audit logs in Google Cloud provide a detailed record of activity within your Google Cloud environment, including who did what, where, and when. Viewing audit logs is crucial for monitoring and ensuring security, compliance, and accountability within your cloud infrastructure. This guide explains how to view audit logs in Google Cloud.
+
+## Understanding Audit Logs
+
+Audit logs capture activities related to your Google Cloud resources, such as creating, modifying, or deleting resources, as well as access and configuration changes. Key information in audit logs includes:
+
+- **Event Type**: The type of event that occurred (e.g., creating a virtual machine, updating a firewall rule).
+  
+- **Resource**: The resource or object that the event affected (e.g., a specific Google Cloud project, a Compute Engine instance).
+
+- **Actor**: The identity that initiated the event, which can be a user, service account, or system account.
+
+- **Timestamp**: The date and time when the event occurred.
+
+## Steps to View Audit Logs
+
+You can view audit logs in Google Cloud Console or by using the `gcloud` command-line tool. Here are the steps for both methods:
+
+### Viewing Audit Logs in Google Cloud Console
+
+1. **Open Google Cloud Console**:
+   - Navigate to the [Google Cloud Console](https://console.cloud.google.com/).
+
+2. **Select a Project**:
+   - Choose the Google Cloud project for which you want to view audit logs.
+
+3. **Navigate to Logging**:
+   - In the left-hand navigation pane, click on "Logging."
+
+4. **Select Logs**:
+   - Click on "Logs" to access the log viewer.
+
+5. **Apply Filters**:
+   - Use the filter bar to specify the audit log type, resource, date range, or other criteria.
+
+6. **View Logs**:
+   - The log viewer will display the audit logs that match your criteria. You can click on individual log entries to see more details.
+
+### Viewing Audit Logs Using `gcloud` Command-Line Tool
+
+1. **Open Terminal**:
+   - Open your terminal or command prompt.
+
+2. **Use `gcloud` Command**:
+   - Use the `gcloud` command to view audit logs. For example, to view Cloud Storage audit logs, you can use the following command:
+
+   ```bash
+   gcloud logging read "resource.type=project AND resource.labels.project_id=YOUR_PROJECT_ID AND logName=logs/cloudaudit.googleapis.com%2Fdata_access" --limit=10
+   ```
+
+   Replace `YOUR_PROJECT_ID` with your actual project ID.
+
+3. **Apply Filters**:
+   - You can modify the filter in the `gcloud` command to specify different criteria based on your requirements.
+
+4. **View Logs**:
+   - Execute the command, and it will display audit logs matching your filter criteria in the terminal.
+
+## Monitoring and Compliance
+
+Viewing audit logs is an essential part of monitoring your Google Cloud environment and ensuring compliance with security policies and regulatory requirements. By regularly reviewing audit logs, you can detect suspicious activities, investigate incidents, and maintain a secure and well-managed cloud infrastructure.
