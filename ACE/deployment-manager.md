@@ -110,6 +110,49 @@ Deploying a virtual machine (VM) using Deployment Manager involves defining a co
 **Step 3: Create a Deployment Configuration File**
 - Write a configuration file in YAML or Jinja2 format. This file should define your VM and its properties, such as machine type, image, and network settings.
 
+Here's an example of a Deployment Manager YAML configuration file for launching a Google Compute Engine (GCE) virtual machine (VM). This example creates a simple VM with specific properties, such as the machine type, image, and network settings. Please note that the values in this example may need to be adjusted according to your specific requirements:
+
+```yaml
+resources:
+- name: my-vm-instance
+  type: compute.v1.instance
+  properties:
+    zone: us-central1-a
+    machineType: zones/us-central1-a/machineTypes/n1-standard-2
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: projects/debian-cloud/global/images/family/debian-10
+    networkInterfaces:
+    - network: global/networks/default
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+```
+
+In this example YAML configuration file:
+
+- The `resources` section specifies the resources to be created.
+
+- `name` is the name you assign to the instance (in this case, "my-vm-instance").
+
+- `type` specifies the resource type as a Google Compute Engine instance.
+
+- `properties` contains the configuration details for the instance, including the following:
+
+  - `zone` indicates the Google Cloud zone where the VM will be created (in this case, "us-central1-a").
+
+  - `machineType` defines the machine type for the VM, specifying "n1-standard-2."
+
+  - `disks` lists the configuration for the VM's disk, including the boot disk with a Debian 10 image.
+
+  - `networkInterfaces` defines the network configuration, specifying the default network and external NAT access for internet connectivity.
+
+This YAML file represents a basic configuration for creating a VM instance using Google Deployment Manager. You can customize this file to match your specific requirements, including different machine types, images, and network settings.
+
 **Step 4: Deploy the Configuration**
 - Use the `gcloud deployment-manager deployments create` command to deploy your configuration file.
 - For example:
