@@ -102,4 +102,55 @@ Federated query allows you to join data from Cloud Storage, Cloud Bigtable, and 
 ### Real-time Streaming Analytics
 In a real-time data processing scenario, federated query enables you to analyze incoming streaming data from external sources in combination with historical data for up-to-the-minute insights.
 
-In conclusion, federated query in Google BigQuery opens new horizons for organizations seeking to leverage data from diverse sources for analytics and decision-making. Its ability to seamlessly integrate with external data sources, support real-time and historical data analysis, and simplify data access makes it a valuable tool for modern data architectures. By harnessing federated query, organizations can gain a more comprehensive view of their data and derive deeper insights, regardless of where the data resides.
+Federated queries in BigQuery allow you to query data across multiple data sources, including Google Cloud SQL databases. To demonstrate a federated query example from BigQuery to Cloud SQL, we'll assume you have a Google Cloud project set up with both BigQuery and Cloud SQL resources. Here's a step-by-step example:
+
+**Step 1: Set up BigQuery and Cloud SQL**
+
+- Make sure you have a Google Cloud project with both BigQuery and Cloud SQL instances created.
+
+**Step 2: Set Up a Connection**
+
+- In your Google Cloud project, create a connection to your Cloud SQL instance in BigQuery. This connection allows BigQuery to access your Cloud SQL data. Follow these steps:
+  - In the Google Cloud Console, go to BigQuery.
+  - In the left sidebar, under "Resources," select your project and dataset.
+  - In the "Details" tab, click "Create Connection."
+  - Fill in the connection details for your Cloud SQL instance, including the instance name, database name, and connection name.
+
+**Step 3: Query Data**
+
+Now that you've set up the connection, you can run federated queries in BigQuery that access your Cloud SQL data.
+
+Here's an example SQL query that joins data from a BigQuery table and a Cloud SQL table:
+
+```sql
+SELECT
+  bqtable.column1 AS bigquery_column,
+  cloudsqltable.column2 AS cloudsql_column
+FROM
+  `your-project.your-dataset.your-bigquery-table` AS bqtable
+INNER JOIN EXTERNAL_QUERY(
+  'your-project.connection-name',
+  '''
+  SELECT column2
+  FROM your-cloudsql-table
+  '''
+) AS cloudsqltable
+ON bqtable.join_column = cloudsqltable.join_column;
+```
+
+In this example:
+
+- `your-project.your-dataset.your-bigquery-table` is a BigQuery table you want to join with data from Cloud SQL.
+- `your-project.connection-name` is the connection name you created in Step 2.
+- `your-cloudsql-table` is the name of the table in your Cloud SQL instance that you want to query.
+- `join_column` is the column you want to use for the join.
+
+This query performs an inner join between the BigQuery and Cloud SQL tables and selects specific columns from each source.
+
+Make sure to adapt the SQL query to your specific table structures and data.
+
+**Step 4: Run the Query**
+
+Execute the query in BigQuery. It will access the Cloud SQL data through the external connection and return the results, which you can then analyze or use for further processing in BigQuery.
+
+Federated queries in BigQuery open up powerful possibilities for analyzing and combining data from various sources, including Cloud SQL, without needing to manually move or replicate the data.
