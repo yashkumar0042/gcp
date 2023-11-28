@@ -1,0 +1,6 @@
+google-cloud-secret-manager
+tweepy
+google-cloud-bigquery
+google-auth
+google-auth-oauthlib
+google-cloud-secret-manager
