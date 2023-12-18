@@ -1,8 +1,8 @@
 #Q#031. You are a retailer that wants to integrate your online sales capabilities with different in-home assistants, such as Google Home. You need to interpret customer voice commands and issue an order to the backend systems. Which solutions should you choose?
-A. Cloud Speech-to-Text API
-B. Cloud Natural Language API
-C. Dialogflow Enterprise Edition
-D. Cloud AutoML Natural Language
+** A. Cloud Speech-to-Text API
+** B. Cloud Natural Language API
+** C. Dialogflow Enterprise Edition
+** D. Cloud AutoML Natural Language
 
 If you need to choose only one solution for interpreting customer voice commands and issuing orders to backend systems, Dialogflow Enterprise Edition would be the most suitable choice. Dialogflow is designed specifically for building conversational interfaces and understanding user intents. It integrates well with various platforms, including Google Home, and allows you to create natural language understanding models and conversational flows to handle voice commands effectively.
 
