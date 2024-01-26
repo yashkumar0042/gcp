@@ -1,4 +1,4 @@
-As of my last knowledge update in January 2023, Dataplex is a platform developed by Google Cloud that facilitates the management, discovery, and analysis of data across various sources and environments. It's important to note that the information provided here may not include the latest developments or changes that may have occurred after January 2023.
+ Dataplex is a platform developed by Google Cloud that facilitates the management, discovery, and analysis of data across various sources and environments. It's important to note that the information provided here may not include the latest developments or changes that may have occurred after January 2023.
 
 As of my last update:
 
