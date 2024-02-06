@@ -1,6 +1,6 @@
 ##  ###############################################################################
 ##
-##   NAME:           main.py (ssot-cicd-automation)
+##   NAME:           main.py (cicd-automation)
 ##
 ##   DESCRIPTION:    This script will create datasets and tables tf configuration file and table schema json file by taking input from excel file.
 ##
