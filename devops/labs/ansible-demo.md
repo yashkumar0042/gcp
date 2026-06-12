@@ -145,18 +145,9 @@ vi inventory.yaml
 Paste this, replacing IPs:
 
 ```yaml
-all:
-  children:
-    webservers:
-      hosts:
-        slave1:
-          ansible_host: SLAVE1_PRIVATE_IP
-          ansible_user: YOUR_USERNAME
-          ansible_ssh_private_key_file: ~/.ssh/ansible_key
-        slave2:
-          ansible_host: SLAVE2_PRIVATE_IP
-          ansible_user: YOUR_USERNAME
-          ansible_ssh_private_key_file: ~/.ssh/ansible_key
+[webservers]
+slave1 ansible_host=10.160.0.4 ansible_user=yash1t1508 ansible_ssh_private_key_file=~/.ssh/ansible_key
+slave2 ansible_host=10.160.0.5 ansible_user=yash1t1508 ansible_ssh_private_key_file=~/.ssh/ansible_key
 ```
 
 Check username on master:
