@@ -12,6 +12,7 @@ MACHINE_TYPE="e2-micro"
 MASTER="ansible-master"
 SLAVE1="ansible-slave-1"
 SLAVE2="ansible-slave-2"
+USER_NAME=`whoami'
 ```
 
 ## 2. Create 3 Ubuntu VMs
