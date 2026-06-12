@@ -96,7 +96,7 @@ Inside slave 1:
 
 ```bash
 mkdir -p ~/.ssh
-nano ~/.ssh/authorized_keys
+vi ~/.ssh/authorized_keys
 ```
 
 Paste the public key from master, save, then:
@@ -139,7 +139,7 @@ cd ~/ansible-lab
 ## 11. Create inventory file
 
 ```bash
-nano inventory.yaml
+vi inventory.yaml
 ```
 
 Paste this, replacing IPs:
