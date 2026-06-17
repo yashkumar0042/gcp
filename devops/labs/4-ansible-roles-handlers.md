@@ -1,0 +1,524 @@
+
+---
+
+## 1. Final folder structure
+
+Inside your current folder:
+
+```bash
+cd ~/ansible-lab
+```
+
+Create this structure:
+
+```bash
+mkdir -p roles/webserver/tasks
+mkdir -p roles/webserver/handlers
+mkdir -p roles/webserver/templates
+mkdir -p roles/webserver/defaults
+```
+
+Final structure:
+
+```bash
+~/ansible-lab
+├── inventory.yaml
+├── site.yml
+└── roles
+    └── webserver
+        ├── defaults
+        │   └── main.yml
+        ├── handlers
+        │   └── main.yml
+        ├── tasks
+        │   └── main.yml
+        └── templates
+            ├── ansible-managed.conf.j2
+            └── index.html.j2
+```
+
+---
+
+## 2. Your inventory file can remain same
+
+Your `inventory.yaml` is actually in **INI format**, but that is okay if Ansible is reading it properly.
+
+```ini
+[webservers]
+slave1 ansible_host=10.160.0.4 ansible_user=yash1t1508 ansible_ssh_private_key_file=~/.ssh/ansible_key
+slave2 ansible_host=10.160.0.5 ansible_user=yash1t1508 ansible_ssh_private_key_file=~/.ssh/ansible_key
+```
+
+---
+
+## 3. Create main playbook: `site.yml`
+
+```yaml
+---
+- name: Configure GCP slave web servers using role
+  hosts: webservers
+  become: yes
+
+  roles:
+    - webserver
+```
+
+Now this playbook is very small because the actual work is inside the role.
+
+---
+
+# Example 1: Basic Webserver Role with Handler
+
+## 4. Create role variables: `roles/webserver/defaults/main.yml`
+
+```yaml
+---
+web_package_name: nginx
+web_service_name: nginx
+web_root: /var/www/html
+web_page_title: "Ansible Configured Server"
+```
+
+Why this is good?
+
+Instead of hardcoding `nginx`, `/var/www/html`, etc. everywhere, we keep values in one place.
+
+---
+
+## 5. Create tasks: `roles/webserver/tasks/main.yml`
+
+```yaml
+---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install nginx web server
+  ansible.builtin.apt:
+    name: "{{ web_package_name }}"
+    state: present
+
+- name: Start and enable nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Create common Ansible managed configuration file
+  ansible.builtin.template:
+    src: ansible-managed.conf.j2
+    dest: /etc/ansible-managed.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create custom nginx homepage
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ web_root }}/index.html"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+```
+
+Important point:
+
+```yaml
+notify: Restart nginx
+```
+
+This means:
+**Only if `index.html` changes, then call the handler named `Restart nginx`.**
+
+---
+
+## 6. Create handler: `roles/webserver/handlers/main.yml`
+
+```yaml
+---
+- name: Restart nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: restarted
+```
+
+This handler will not run always. It runs only when some task notifies it.
+
+---
+
+## 7. Create template: `roles/webserver/templates/ansible-managed.conf.j2`
+
+```jinja2
+This server is managed by Ansible.
+Hostname: {{ inventory_hostname }}
+Managed at: {{ ansible_date_time.iso8601 }}
+```
+
+This is same as your current copy task, but better because templates are more reusable.
+
+---
+
+## 8. Create homepage template: `roles/webserver/templates/index.html.j2`
+
+```html
+<html>
+  <head>
+    <title>{{ web_page_title }}</title>
+  </head>
+  <body>
+    <h1>Hello from {{ inventory_hostname }}</h1>
+    <p>This server was configured using Ansible role.</p>
+    <p>Managed by ansible-master in GCP.</p>
+    <p>Server IP: {{ ansible_host | default('N/A') }}</p>
+    <p>Updated at: {{ ansible_date_time.iso8601 }}</p>
+  </body>
+</html>
+```
+
+---
+
+## 9. Run the role-based playbook
+
+```bash
+ansible-playbook -i inventory.yaml site.yml
+```
+
+Check nginx from master:
+
+```bash
+curl http://10.160.0.4
+curl http://10.160.0.5
+```
+
+---
+
+# Example 2: Multiple Tasks Notifying Same Handler
+
+This is a very common production use case.
+
+Suppose you have:
+
+1. nginx config changed
+2. homepage changed
+3. site config changed
+
+You do **not** want nginx to restart 3 times. You want it to restart only once.
+
+Update `roles/webserver/tasks/main.yml` like this:
+
+```yaml
+---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install nginx web server
+  ansible.builtin.apt:
+    name: "{{ web_package_name }}"
+    state: present
+
+- name: Start and enable nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Create common Ansible managed configuration file
+  ansible.builtin.template:
+    src: ansible-managed.conf.j2
+    dest: /etc/ansible-managed.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create custom nginx homepage
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ web_root }}/index.html"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+
+- name: Create simple nginx site config
+  ansible.builtin.copy:
+    dest: /etc/nginx/sites-available/default
+    content: |
+      server {
+          listen 80 default_server;
+          listen [::]:80 default_server;
+
+          root /var/www/html;
+          index index.html index.htm;
+
+          server_name _;
+
+          location / {
+              try_files $uri $uri/ =404;
+          }
+      }
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+```
+
+Even if both homepage and nginx config change, this handler runs only once:
+
+```yaml
+---
+- name: Restart nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: restarted
+```
+
+This is the real power of handlers.
+
+---
+
+# Example 3: Handler with `listen`
+
+This is slightly advanced and very useful.
+
+Instead of notifying exact handler name like this:
+
+```yaml
+notify: Restart nginx
+```
+
+You can notify a generic event:
+
+```yaml
+notify: nginx changed
+```
+
+Then handler listens to that event.
+
+## `roles/webserver/tasks/main.yml`
+
+```yaml
+---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install nginx web server
+  ansible.builtin.apt:
+    name: "{{ web_package_name }}"
+    state: present
+
+- name: Start and enable nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Create custom nginx homepage
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ web_root }}/index.html"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: nginx changed
+
+- name: Create nginx site config
+  ansible.builtin.copy:
+    dest: /etc/nginx/sites-available/default
+    content: |
+      server {
+          listen 80 default_server;
+          root /var/www/html;
+          index index.html;
+          server_name _;
+
+          location / {
+              try_files $uri $uri/ =404;
+          }
+      }
+    owner: root
+    group: root
+    mode: '0644'
+  notify: nginx changed
+```
+
+## `roles/webserver/handlers/main.yml`
+
+```yaml
+---
+- name: Test nginx configuration
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  listen: nginx changed
+
+- name: Restart nginx safely
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: restarted
+  listen: nginx changed
+```
+
+This is better because before restarting nginx, Ansible first checks:
+
+```bash
+nginx -t
+```
+
+If config is wrong, restart will not happen blindly.
+
+---
+
+# Best version for your current lab
+
+Use this simple final version.
+
+## `site.yml`
+
+```yaml
+---
+- name: Configure GCP slave web servers using Ansible role
+  hosts: webservers
+  become: yes
+
+  roles:
+    - webserver
+```
+
+## `roles/webserver/defaults/main.yml`
+
+```yaml
+---
+web_package_name: nginx
+web_service_name: nginx
+web_root: /var/www/html
+web_page_title: "Ansible Configured Server"
+```
+
+## `roles/webserver/tasks/main.yml`
+
+```yaml
+---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install nginx web server
+  ansible.builtin.apt:
+    name: "{{ web_package_name }}"
+    state: present
+
+- name: Start and enable nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Create common configuration file
+  ansible.builtin.template:
+    src: ansible-managed.conf.j2
+    dest: /etc/ansible-managed.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create custom nginx homepage
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ web_root }}/index.html"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
+```
+
+## `roles/webserver/handlers/main.yml`
+
+```yaml
+---
+- name: Restart nginx
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: restarted
+```
+
+## `roles/webserver/templates/ansible-managed.conf.j2`
+
+```jinja2
+This server is managed by Ansible.
+Hostname: {{ inventory_hostname }}
+Managed at: {{ ansible_date_time.iso8601 }}
+```
+
+## `roles/webserver/templates/index.html.j2`
+
+```html
+<html>
+  <head>
+    <title>{{ web_page_title }}</title>
+  </head>
+  <body>
+    <h1>Hello from {{ inventory_hostname }}</h1>
+    <p>This server was configured using Ansible role.</p>
+    <p>Managed by ansible-master in GCP.</p>
+  </body>
+</html>
+```
+
+---
+
+## Commands to test
+
+Syntax check:
+
+```bash
+ansible-playbook -i inventory.yaml site.yml --syntax-check
+```
+
+Dry run:
+
+```bash
+ansible-playbook -i inventory.yaml site.yml --check
+```
+
+Actual run:
+
+```bash
+ansible-playbook -i inventory.yaml site.yml
+```
+
+Test both servers:
+
+```bash
+curl http://10.160.0.4
+curl http://10.160.0.5
+```
+
+---
+
+## Interview explanation
+
+You can say this:
+
+> Earlier my playbook had all tasks in one file. I converted it into an Ansible role called `webserver`. The role contains tasks, handlers, templates, and default variables. Tasks install and configure nginx. The homepage is generated using a Jinja2 template. When the homepage changes, it notifies the `Restart nginx` handler. This makes the playbook idempotent because nginx restarts only when required, not on every run.
+
+This is the clean concept:
+
+```text
+Playbook calls role
+        ↓
+Role runs tasks
+        ↓
+Task changes file
+        ↓
+Task notifies handler
+        ↓
+Handler restarts nginx only if needed
+```
+
+[1]: https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html?utm_source=chatgpt.com "Roles — Ansible Community Documentation"
