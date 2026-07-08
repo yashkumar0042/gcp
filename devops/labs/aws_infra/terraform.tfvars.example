@@ -1,0 +1,4 @@
+aws_region       = "ap-south-1"
+project_name     = "tf-web-rds-demo"
+allowed_ssh_cidr = "YOUR_PUBLIC_IP/32"
+key_name         = "YOUR_EXISTING_EC2_KEY_PAIR_NAME"
