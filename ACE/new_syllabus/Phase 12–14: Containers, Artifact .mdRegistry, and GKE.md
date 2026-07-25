@@ -747,6 +747,7 @@ curl http://localhost:8080
 Cause:
 
 - Missing `roles/artifactregistry.writer`
+- Missing `roles/cloudbuild.builds.editor`
 - Wrong authenticated account
 - Repository belongs to another project
 
