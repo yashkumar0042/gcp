@@ -1,7 +1,3 @@
-
-
-
-
 # Phase 12–14: Containers, Artifact Registry, and GKE
 
 These phases cover the complete flow:
